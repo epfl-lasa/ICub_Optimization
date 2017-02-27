@@ -1,0 +1,2 @@
+/usr/bin/ar cr libiCubOpt.a  CMakeFiles/iCubOpt.dir/src/iCubOpt.cpp.o CMakeFiles/iCubOpt.dir/src/W_STATIC.cpp.o
+/usr/bin/ranlib libiCubOpt.a

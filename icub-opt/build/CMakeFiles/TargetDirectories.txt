@@ -1,0 +1,2 @@
+/home/neda/iCub/icub-optimization-1/icub-opt/build/CMakeFiles/iCubOpt.dir
+/home/neda/iCub/icub-optimization-1/icub-opt/build/CMakeFiles/test.dir
