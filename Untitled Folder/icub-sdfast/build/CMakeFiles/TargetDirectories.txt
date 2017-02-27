@@ -1,0 +1,2 @@
+/home/neda/iCub/icub-sdfast/build/CMakeFiles/Model.dir
+/home/neda/iCub/icub-sdfast/build/CMakeFiles/test.dir

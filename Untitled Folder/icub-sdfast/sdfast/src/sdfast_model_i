@@ -1,0 +1,123 @@
+SD/FAST Information File: sdfast_model.sd
+Generated 14-Feb-2017 19:08:37 by SD/FAST, Kane's formulation
+(sdfast B.2.8 #30123) on machine ID unknown
+
+ROADMAP (sdfast_model.sd)
+
+Bodies              Inb
+No  Name            body Joint type  Coords q         Multipliers
+--- --------------- ---- ----------- ---------------- -----------------------
+ -1 $ground                                          |
+  0 root             -1  Sixdof        0?  1?  2?    |
+                         ...           3?  4?  5? 38 |  0p  1p  2p  3p  4p  5p
+  1 torso_1           0  Pin           6?            |  6p
+  2 torso_2           1  Pin           7?            |  7p
+  3 chest             2  Pin           8?            |  8p
+  4 left_shoulder_1   3  Pin           9?            |  9p
+  5 left_shoulder_2   4  Pin          10?            | 10p
+  6 left_shoulder_3   5  Pin          11?            | 11p
+  7 left_upper_arm    6  Weld                        |
+  8 left_elbow_1      7  Pin          12?            | 12p
+  9 left_forearm      8  Pin          13?            | 13p
+ 10 left_wrist_1      9  Pin          14?            | 14p
+ 11 left_hand_base_link                              |
+                     10  Pin          15?            | 15p
+ 12 left_hip_1        0  Pin          16?            | 16p
+ 13 left_hip_2       12  Pin          17?            | 17p
+ 14 left_hip_3       13  Weld                        |
+ 15 left_upper_leg   14  Pin          18?            | 18p
+ 16 left_lower_leg   15  Pin          19?            | 19p
+ 17 left_ankle_1     16  Pin          20?            | 20p
+ 18 left_ankle_2     17  Pin          21?            | 21p
+ 19 left_foot        18  Weld                        |
+ 20 right_shoulder_1                                 |
+                      3  Pin          22?            | 22p
+ 21 right_shoulder_2                                 |
+                     20  Pin          23?            | 23p
+ 22 right_shoulder_3                                 |
+                     21  Pin          24?            | 24p
+ 23 right_upper_arm  22  Weld                        |
+ 24 right_elbow_1    23  Pin          25?            | 25p
+ 25 right_forearm    24  Pin          26?            | 26p
+ 26 right_wrist_1    25  Pin          27?            | 27p
+ 27 right_hand_base_link                             |
+                     26  Pin          28?            | 28p
+ 28 right_hip_1       0  Pin          29?            | 29p
+ 29 right_hip_2      28  Pin          30?            | 30p
+ 30 right_hip_3      29  Weld                        |
+ 31 right_upper_leg  30  Pin          31?            | 31p
+ 32 right_lower_leg  31  Pin          32?            | 32p
+ 33 right_ankle_1    32  Pin          33?            | 33p
+ 34 right_ankle_2    33  Pin          34?            | 34p
+ 35 right_foot       34  Weld                        |
+ 36 neck_1            3  Pin          35?            | 35p
+ 37 neck_2           36  Pin          36?            | 36p
+ 38 head             37  Pin          37?            | 37p
+
+
+STATE INDEX TO JOINT/AXIS MAP (sdfast_model.sd)
+
+ Index
+  q|u   Joint  Axis   Joint type    Axis type    Joint Name
+ -----  -----  ----   -----------   ----------   ----------
+  0|39      0     0?  Sixdof        translate    
+  1|40      .     1?  .             translate 
+  2|41      .     2?  .             translate 
+  3|42      .     3?  .             quaternion
+  4|43      .     4?  .             quaternion
+  5|44      .     5?  .             quaternion
+  6|45      1     0?  Pin           rotate       
+  7|46      2     0?  Pin           rotate       
+  8|47      3     0?  Pin           rotate       
+  9|48      4     0?  Pin           rotate       
+ 10|49      5     0?  Pin           rotate       
+ 11|50      6     0?  Pin           rotate       
+ 12|51      8     0?  Pin           rotate       
+ 13|52      9     0?  Pin           rotate       
+ 14|53     10     0?  Pin           rotate       
+ 15|54     11     0?  Pin           rotate       
+ 16|55     12     0?  Pin           rotate       
+ 17|56     13     0?  Pin           rotate       
+ 18|57     15     0?  Pin           rotate       
+ 19|58     16     0?  Pin           rotate       
+ 20|59     17     0?  Pin           rotate       
+ 21|60     18     0?  Pin           rotate       
+ 22|61     20     0?  Pin           rotate       
+ 23|62     21     0?  Pin           rotate       
+ 24|63     22     0?  Pin           rotate       
+ 25|64     24     0?  Pin           rotate       
+ 26|65     25     0?  Pin           rotate       
+ 27|66     26     0?  Pin           rotate       
+ 28|67     27     0?  Pin           rotate       
+ 29|68     28     0?  Pin           rotate       
+ 30|69     29     0?  Pin           rotate       
+ 31|70     31     0?  Pin           rotate       
+ 32|71     32     0?  Pin           rotate       
+ 33|72     33     0?  Pin           rotate       
+ 34|73     34     0?  Pin           rotate       
+ 35|74     36     0?  Pin           rotate       
+ 36|75     37     0?  Pin           rotate       
+ 37|76     38     0?  Pin           rotate       
+ 38|        0     6   Sixdof        4th quat  
+   
+
+SYSTEM PARAMETERS (sdfast_model.sd)
+
+Parameter  Value  Description
+
+nbod          39  no. bodies (also, no. of tree joints)
+njnt          39  total number of joints (tree+loop)
+ndof          38  no. degrees of freedom allowed by tree joints
+nloop          0  no. loop joints
+nldof          0  no. degrees of freedom allowed by loop joints
+
+nq            39  no. position coordinates in state (tree joints)
+nu            38  no. rate coordinates in state (tree joints)
+nlq            0  no. position coordinates describing loop joints
+nlu            0  no. rate coordinates describing loop joints
+
+nc            38  total no. constraints defined
+nlc            0  no. loop joint constraints
+npresc        38  no. prescribed motion constraints
+nuserc         0  no. user constraints
+

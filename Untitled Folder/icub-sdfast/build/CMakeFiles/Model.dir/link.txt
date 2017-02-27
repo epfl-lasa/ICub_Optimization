@@ -1,0 +1,2 @@
+/usr/bin/ar cr libModel.a  CMakeFiles/Model.dir/sdfast/src/sdfast_model_lib.c.o CMakeFiles/Model.dir/sdfast/src/sdfast_model_d.c.o CMakeFiles/Model.dir/sdfast/src/motions.c.o CMakeFiles/Model.dir/sdfast/src/sdfast_model_s.c.o CMakeFiles/Model.dir/codes/src/Basics.cpp.o CMakeFiles/Model.dir/codes/src/Model.cpp.o
+/usr/bin/ranlib libModel.a
