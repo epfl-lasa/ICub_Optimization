@@ -9,9 +9,12 @@ int main()
     model.init();
 
 
-	Cvector ref_pos = Cvector::Zero(AIR_N_Q);
+	Cvector ref_pos = Cvector::Zero(AIR_N_U);
 	// height of root link is set here to be consistent with root link in gazebo
 	ref_pos[2] = 0.6 ; // height of root link
+
+	ref_pos[12] = 0.959931 ;    // l_elbow
+	ref_pos[25] = 0.959931 ;    // r_elbow
 
 	// set initial joint angles
 	/*ref_pos[9] = -0.52 ;    //left shoulder pitch,
@@ -24,76 +27,37 @@ int main()
 	ref_pos[25] = 0.785 ;
 	ref_pos[28] = 0.436332 ;*/
 
+	//ref_pos[8] = 1.85005 ;    // l_elbow
+	//ref_pos[24] = 1.85005 ;    // r_elbow
 
-	ref_pos[12] = 0.0959931 ;    // l_elbow
-	ref_pos[25] = 0.0959931 ;    // r_elbow
+
 	/*ref_pos[15] = 0.436332 ;    // l_wrist_yaw
 	ref_pos[28] = 0.436332 ;    // l_wrist_yaw*/
 
-
 	Cvector ref_vel = Cvector::Zero(AIR_N_U);
+	   model.set_state(0, ref_pos, ref_vel);
 
     std::ofstream jacobian_mat ;
     jacobian_mat.open( "jacobian_mat.txt", std::ofstream::out | std::ofstream::app );
 
 
-             model.set_state(0, ref_pos, ref_vel);
-         //  model.check_consistency(Cvector::Random(AIR_N_Q),Cvector::Random(AIR_N_U),Cvector::Random(AIR_N_U));
 
 
    Cmatrix jac_tr = model.get_jacob(11, Cvector3(0,0,0), CT_TRANSLATION);
    Cmatrix jac_rot = model.get_jacob(11, Cvector3(0,0,0), CT_ROTATION);
-/*
 
-/// print desired elements
-   for(unsigned int i = 0; i < 16; ++i)
-   {
-	   jacobian_mat << jac_tr(0,i) << "  "   ;
-   }
+   Cvector3 end_vel = jac_tr * ref_vel ;
 
-   jacobian_mat << endl << endl ;
-   for(unsigned int i = 0; i < 16; ++i)
-      {
-   	   jacobian_mat << jac_tr(1,i) << "  "   ;
-      }
-   jacobian_mat << endl <<endl ;
-
-   for(unsigned int i = 0; i < 16; ++i)
-      {
-   	   jacobian_mat << jac_tr(2,i) << "  "   ;
-      }
-   jacobian_mat << endl <<endl <<endl <<endl <<endl ;
-/////////////////
-   for(unsigned int i = 0; i < 16; ++i)
-      {
-   	   jacobian_mat << jac_rot(0,i) << "  "   ;
-      }
-
-      jacobian_mat << endl << endl ;
-      for(unsigned int i = 0; i < 16; ++i)
-         {
-      	   jacobian_mat << jac_rot(1,i) << "  "   ;
-         }
-      jacobian_mat << endl <<endl ;
-
-      for(unsigned int i = 0; i < 16; ++i)
-         {
-      	   jacobian_mat << jac_rot(2,i) << "  "   ;
-         }
-/// end of print
-
-*/
-
-   //cout << model.get_jacob(11, Cvector3(0,0,0), CT_TRANSLATION) << endl << endl;
+   std::cout << "Velocity end effector = "<< end_vel.transpose() << std::endl;
+   std::cout << "Velocity end effector 2  = "<< model.get_vel(11,Cvector3(0,0,0) ).transpose() << std::endl;
 
 
-  // cout << model.get_jacob(11, Cvector3(0,0,0), CT_ROTATION) << endl << endl;
 
- //  cout << model.get_massmat() << endl;
 
-   cout << model.get_massmat() << endl;
+   cout << "Mass Matrix = "<<model.get_massmat() << endl;
 
-   cout << model.get_cm().transpose() << endl;
+
+   cout << "Center of Gravity = "<<model.get_cm().transpose() << endl;
 
    for (unsigned int j = 0;j < 39; ++j )
    {
@@ -101,6 +65,7 @@ int main()
 
    }
 
-   std::cout << model.get_pos(-1, Cvector3(0,0,0)) << std::endl;
+
+
     return 0;
 }
