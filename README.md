@@ -9,5 +9,5 @@ Another constraint is concerning the direction of velocity. In order to satisfy 
 # Prerequisite
 In each iteration of the optimization loop, center of mass of the robot and velocity of the end-effector(directly or using the jacobian matrix) should be calculated. To this end, SD/FAST is implemented which is more efficient in computational time than using the Gazebo functions. So, first the model of robot should be run seperately in SD/FAST. For more information on how to use SD/FAST, please refer to [this repository](https://github.com/epfl-lasa/SDfast).
 
-
+# Optimization Code
 
