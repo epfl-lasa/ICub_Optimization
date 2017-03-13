@@ -792,18 +792,22 @@ void iCubOpt::W_STATIC_shot(const double sx[], double sF[],  double sG[] )
 	// std::cout << "Direction_norm = " << dir_norm <<std::endl ;
 
 
+	// to solve the general problem, following equation should be sF[79]:
 	sF[1]=  dir_norm ;
 
 
-
-
+	// known elements of gradient matrix should be defined here: 
+	// q[i+1] = q[i] + dt * q_dot[i+1] = q[i] + dt * ( q_dot[i] + dt * q_2dot[i+1]) ;
+	// q_dot[i+1] = q_dot[i] + dt * q_2dot[i+1] ;
+	
+	
 	/* for (unsigned int j = 16; j < 54; j++ )
     {
     	sG[j]= dt * dt;
     }
-
     for (unsigned int j = 54; j < 92; j++ )
     {
     	sG[j]= dt;
     }*/
+	
 } 
