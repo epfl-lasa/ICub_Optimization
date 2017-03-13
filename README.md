@@ -9,7 +9,12 @@ Another constraint is concerning the direction of velocity. In order to satisfy 
 # Prerequisite
 In each iteration of the optimization loop, center of mass of the robot and velocity of the end-effector(directly or using the jacobian matrix) should be calculated. To this end, SD/FAST is implemented which is more efficient in computational time than using the Gazebo functions. So, first the model of robot should be run seperately in SD/FAST. For more information on how to use SD/FAST, please refer to [this repository](https://github.com/epfl-lasa/SDfast).
 
-SNOPT library should aslo be provided in a seperate [folder](https://github.com/epfl-lasa/ICub_Optimization/tree/master/snopt). 
+SNOPT library should aslo be provided in a seperate [folder](https://github.com/epfl-lasa/ICub_Optimization/tree/master/snopt). A detailed manual for SNOPT is available [here](web.stanford.edu/group/SOL/guides/sndoc7.pdf).
 
-# Optimization Code
+# Optimization Loop
+The main loop which includes stopping criteria of the optimization has been defined in [test.cpp](https://github.com/epfl-lasa/ICub_Optimization/blob/master/icub-opt/test.cpp). The criteria (epsilon) is the difference between the end-effector position and desired intercept point. 
+
+[W_STATIC.cpp](https://github.com/epfl-lasa/ICub_Optimization/blob/master/icub-opt/src/W_STATIC.cpp) includes two seperate functions (W_STATIC_init and W_STATIC_update) which define the initial condition, upper and lower bands on const function and constraints, and patern of non-zero elements of gradient matrix.
+
+Also, there is another function (W_STATIC_shot) which define the equation of cost function and constrints. Also, known elements of gradient matrix should be defined here. 
 
