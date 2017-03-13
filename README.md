@@ -16,5 +16,5 @@ The main loop which includes stopping criteria of the optimization has been defi
 
 [W_STATIC.cpp](https://github.com/epfl-lasa/ICub_Optimization/blob/master/icub-opt/src/W_STATIC.cpp) includes two seperate functions (W_STATIC_init and W_STATIC_update) which define the initial condition, upper and lower bands on const function and constraints, and patern of non-zero elements of gradient matrix.
 
-Also, there is another function (W_STATIC_shot) which define the equation of cost function and constrints. Also, known elements of gradient matrix should be defined here. 
+Also, there is another function (W_STATIC_shot) which defines the equation of cost function and constrints. Also, known elements of gradient matrix should be defined here. 
 
