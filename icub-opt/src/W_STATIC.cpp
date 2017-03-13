@@ -179,11 +179,19 @@ void iCubOpt::W_STATIC_init()
 	{
 		W_STATIC_vars.Flow[i]= -0.785;
 		W_STATIC_vars.Fupp[i]= 0.785;
-	}*/
+	}
+	
+	// Equations F(77) and F(78) are related to x and y position of center of mass
+	
+	W_STATIC_vars.Flow[77]= -5.000000e-02; W_STATIC_vars.Fupp[77]= 15.000000e-02;
+	W_STATIC_vars.Flow[78]= -7.000000e-02; W_STATIC_vars.Fupp[78]= 7.000000e-02;
+	
+	*/
 
-	//  Equation F(77) is related to direction of velocity in the next step
 	// In order to see the effect of this constraint, we removed all other constraint.
-	// To solve the general problem, uncomment all above bands (from F(1) to F(38)) and modify the index of the following band:
+	// To solve the general problem, uncomment all above bands (from F(1) to F(78)) and modify the index of the following band:
+	//  Equation F(79) is related to direction of velocity in the next step
+
 	W_STATIC_vars.Flow[1]= -2.000000e-01; W_STATIC_vars.Fupp[1]= 2.000000e-01;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -228,12 +236,26 @@ void iCubOpt::W_STATIC_init()
 	// For center of mass constraint: iGfun=77 
 	
 	int kk = 0 ;
-	for (unsigned int k = 92; k<108 ; ++k )
+	for (unsigned int i = 92; i<108 ; ++i )
 	{
-		W_STATIC_vars.iGfun[k] = 77 ;
-		W_STATIC_vars.jGvar[k] = kk ;
+		W_STATIC_vars.iGfun[i] = 77 ;
+		W_STATIC_vars.jGvar[i] = kk ;
 		kk = kk + 1 ;
-	}*/
+	}
+	
+	// This loop defines the patern of elements from i=108 to i=123 which are related to the equation of constraint on y-position of center of mass. 
+	// For center of mass constraint: iGfun=78 
+	
+	int kk = 0 ;
+	for (unsigned int i = 108; i<123 ; ++i )
+	{
+		W_STATIC_vars.iGfun[i] = 78 ;
+		W_STATIC_vars.jGvar[i] = kk ;
+		kk = kk + 1 ;
+	}
+	
+	
+	*/
 
 	//This loop defines the patern of elements related to the equation of constraint on velocity direction.
 	// In order to see the effect of this constraint, we removed all other constraint.
@@ -396,11 +418,20 @@ void iCubOpt::W_STATIC_update(double x[])
 	{
 		W_STATIC_vars.Flow[i]= -0.785;
 		W_STATIC_vars.Fupp[i]= 0.785;
-	}*/
+	}
+	
+	// Equations F(77) and F(78) are related to x and y position of center of mass
+	
+	W_STATIC_vars.Flow[77]= -5.000000e-02; W_STATIC_vars.Fupp[77]= 15.000000e-02;
+	W_STATIC_vars.Flow[78]= -7.000000e-02; W_STATIC_vars.Fupp[78]= 7.000000e-02;
 
-	//  Equation F(77) is related to direction of velocity in the next step
+	
+	*/
+
 	// In order to see the effect of this constraint, we removed all other constraint.
-	// To solve the general problem, uncomment all above bands (from F(1) to F(38)) and modify the index of the following band:
+	// To solve the general problem, uncomment all above bands (from F(1) to F(78)) and modify the index of the following band:
+	//  Equation F(79) is related to direction of velocity in the next step
+
 	W_STATIC_vars.Flow[1]= -2.000000e-01; W_STATIC_vars.Fupp[1]= 2.000000e-01;
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -441,16 +472,29 @@ void iCubOpt::W_STATIC_update(double x[])
 	}
 	
 	
-	// This loop defines the patern of elements from i=92 to i=107 which are related to the equation of constraint on center of mass. 
+	// This loop defines the patern of elements from i=92 to i=107 which are related to the equation of constraint on x-position of center of mass. 
 	// For center of mass constraint: iGfun=77 
 	
 	int kk = 0 ;
-	for (unsigned int k = 92; k<108 ; ++k )
+	for (unsigned int i = 92; i<108 ; ++i )
 	{
-		W_STATIC_vars.iGfun[k] = 77 ;
-		W_STATIC_vars.jGvar[k] = kk ;
+		W_STATIC_vars.iGfun[i] = 77 ;
+		W_STATIC_vars.jGvar[i] = kk ;
 		kk = kk + 1 ;
-	}*/
+	}
+	
+	// This loop defines the patern of elements from i=108 to i=123 which are related to the equation of constraint on y-position of center of mass. 
+	// For center of mass constraint: iGfun=78 
+	
+	int kk = 0 ;
+	for (unsigned int i = 108; i<123 ; ++i )
+	{
+		W_STATIC_vars.iGfun[i] = 78 ;
+		W_STATIC_vars.jGvar[i] = kk ;
+		kk = kk + 1 ;
+	}
+	
+	*/
 
 	//This loop defines the patern of elements related to the equation of constraint on velocity direction.
 	// In order to see the effect of this constraint, we removed all other constraint.
@@ -466,7 +510,7 @@ void iCubOpt::W_STATIC_update(double x[])
 	snopt_load_vars_full(W_STATIC_vars);
 }
 
-
+// This function defines the equation of cost function and constraints.
 void iCubOpt::W_STATIC_shot(const double sx[], double sF[],  double sG[] )
 { 
 
@@ -510,35 +554,26 @@ void iCubOpt::W_STATIC_shot(const double sx[], double sF[],  double sG[] )
 	double x37 = sx[36];
 	double x38 = sx[37];
 
-	// cost function
-
+	// cost function = [transpose(J * q_dot) ] * (J * q_dot) = tr(q_dot)* tr(J) * J * q_dot
+	
 	sF[0] = (qd1 + dt * x1) * ((qd1 + dt * x1) * j1_1 + (qd2 + dt * x2) * j2_1 + (qd3 + dt * x3) * j3_1 + (qd4 + dt * x4) * j4_1 + (qd5 + dt * x5) * j5_1 + (qd6 + dt * x6) * j6_1 + (qd7 + dt * x7) * j7_1 + (qd8 + dt * x8) * j8_1 + (qd9 + dt * x9) * j9_1 + (qd10 + dt * x10) * j10_1 + (qd11 + dt * x11) * j11_1 + (qd12+ dt * x12) * j12_1 + (qd13+ dt * x13) * j13_1 + (qd14+ dt * x14) * j14_1 + (qd15+ dt * x15) * j15_1 + (qd16+ dt * x16) * j16_1) + \
-			(qd2 + dt * x2) * ((qd1 + dt * x1) * j1_2 + (qd2 + dt * x2) * j2_2 + (qd3 + dt * x3) * j3_2 + (qd4 + dt * x4) * j4_2 + (qd5 + dt * x5) * j5_2 + (qd6 + dt * x6) * j6_2 + (qd7 + dt * x7) * j7_2 + (qd8 + dt * x8) * j8_2 + (qd9 + dt * x9) * j9_2 + (qd10 + dt * x10) * j10_2 + (qd11 + dt * x11) * j11_2 + (qd12+ dt * x12) * j12_2 + (qd13+ dt * x13) * j13_2 + (qd14+ dt * x14) * j14_2 + (qd15+ dt * x15) * j15_2 + (qd16+ dt * x16) * j16_2) + \
-			(qd3 + dt * x3) * ((qd1 + dt * x1) * j1_3 + (qd2 + dt * x2) * j2_3 + (qd3 + dt * x3) * j3_3 + (qd4 + dt * x4) * j4_3 + (qd5 + dt * x5) * j5_3 + (qd6 + dt * x6) * j6_3 + (qd7 + dt * x7) * j7_3 + (qd8 + dt * x8) * j8_3 + (qd9 + dt * x9) * j9_3 + (qd10 + dt * x10) * j10_3 + (qd11 + dt * x11) * j11_3 + (qd12+ dt * x12) * j12_3 + (qd13+ dt * x13) * j13_3 + (qd14+ dt * x14) * j14_3 + (qd15+ dt * x15) * j15_3 + (qd16+ dt * x16) * j16_3) + \
-			(qd4 + dt * x4) * ((qd1 + dt * x1) * j1_4 + (qd2 + dt * x2) * j2_4 + (qd3 + dt * x3) * j3_4 + (qd4 + dt * x4) * j4_4 + (qd5 + dt * x5) * j5_4 + (qd6 + dt * x6) * j6_4 + (qd7 + dt * x7) * j7_4 + (qd8 + dt * x8) * j8_4 + (qd9 + dt * x9) * j9_4 + (qd10 + dt * x10) * j10_4 + (qd11 + dt * x11) * j11_4 + (qd12+ dt * x12) * j12_4 + (qd13+ dt * x13) * j13_4 + (qd14+ dt * x14) * j14_4 + (qd15+ dt * x15) * j15_4 + (qd16+ dt * x16) * j16_4) + \
-			(qd5 + dt * x5) * ((qd1 + dt * x1) * j1_5 + (qd2 + dt * x2) * j2_5 + (qd3 + dt * x3) * j3_5 + (qd4 + dt * x4) * j4_5 + (qd5 + dt * x5) * j5_5 + (qd6 + dt * x6) * j6_5 + (qd7 + dt * x7) * j7_5 + (qd8 + dt * x8) * j8_5 + (qd9 + dt * x9) * j9_5 + (qd10 + dt * x10) * j10_5 + (qd11 + dt * x11) * j11_5 + (qd12+ dt * x12) * j12_5 + (qd13+ dt * x13) * j13_5 + (qd14+ dt * x14) * j14_5 + (qd15+ dt * x15) * j15_5 + (qd16+ dt * x16) * j16_5) + \
-			(qd6 + dt * x6) * ((qd1 + dt * x1) * j1_6 + (qd2 + dt * x2) * j2_6 + (qd3 + dt * x3) * j3_6 + (qd4 + dt * x4) * j4_6 + (qd5 + dt * x5) * j5_6 + (qd6 + dt * x6) * j6_6 + (qd7 + dt * x7) * j7_6 + (qd8 + dt * x8) * j8_6 + (qd9 + dt * x9) * j9_6 + (qd10 + dt * x10) * j10_6 + (qd11 + dt * x11) * j11_6 + (qd12+ dt * x12) * j12_6 + (qd13+ dt * x13) * j13_6 + (qd14+ dt * x14) * j14_6 + (qd15+ dt * x15) * j15_6 + (qd16+ dt * x16) * j16_1) + \
-			(qd7 + dt * x7) * ((qd1 + dt * x1) * j1_7 + (qd2 + dt * x2) * j2_7 + (qd3 + dt * x3) * j3_7 + (qd4 + dt * x4) * j4_7 + (qd5 + dt * x5) * j5_7 + (qd6 + dt * x6) * j6_7 + (qd7 + dt * x7) * j7_7 + (qd8 + dt * x8) * j8_7 + (qd9 + dt * x9) * j9_7 + (qd10 + dt * x10) * j10_7 + (qd11 + dt * x11) * j11_7 + (qd12+ dt * x12) * j12_7 + (qd13+ dt * x13) * j13_7 + (qd14+ dt * x14) * j14_7 + (qd15+ dt * x15) * j15_7 + (qd16+ dt * x16) * j16_1) + \
-			(qd8 + dt * x8) * ((qd1 + dt * x1) * j1_8 + (qd2 + dt * x2) * j2_8 + (qd3 + dt * x3) * j3_8 + (qd4 + dt * x4) * j4_8 + (qd5 + dt * x5) * j5_8 + (qd6 + dt * x6) * j6_8 + (qd7 + dt * x7) * j7_8 + (qd8 + dt * x8) * j8_8 + (qd9 + dt * x9) * j9_8 + (qd10 + dt * x10) * j10_8 + (qd11 + dt * x11) * j11_8 + (qd12+ dt * x12) * j12_8 + (qd13+ dt * x13) * j13_8 + (qd14+ dt * x14) * j14_8 + (qd15+ dt * x15) * j15_8 + (qd16+ dt * x16) * j16_1) + \
-			(qd9 + dt * x9) * ((qd1 + dt * x1) * j1_9 + (qd2 + dt * x2) * j2_9 + (qd3 + dt * x3) * j3_9 + (qd4 + dt * x4) * j4_9 + (qd5 + dt * x5) * j5_9 + (qd6 + dt * x6) * j6_9 + (qd7 + dt * x7) * j7_9 + (qd8 + dt * x8) * j8_9 + (qd9 + dt * x9) * j9_9 + (qd10 + dt * x10) * j10_9 + (qd11 + dt * x11) * j11_9 + (qd12+ dt * x12) * j12_9 + (qd13+ dt * x13) * j13_9 + (qd14+ dt * x14) * j14_9 + (qd15+ dt * x15) * j15_9 + (qd16+ dt * x16) * j16_1) + \
-			(qd10 + dt * x10) * ((qd1 + dt * x1) * j1_10 + (qd2 + dt * x2) * j2_10 + (qd3 + dt * x3) * j3_10 + (qd4 + dt * x4) * j4_10 + (qd5 + dt * x5) * j5_10 + (qd6 + dt * x6) * j6_10 + (qd7 + dt * x7) * j7_10 + (qd8 + dt * x8) * j8_10 + (qd9 + dt * x9) * j9_10 + (qd10 + dt * x10) * j10_10 + (qd11 + dt * x11) * j11_10 + (qd12+ dt * x12) * j12_10 + (qd13+ dt * x13) * j13_10 + (qd14+ dt * x14) * j14_10 + (qd15+ dt * x15) * j15_10 + (qd16+ dt * x16) * j16_10) + \
-			(qd11 + dt * x11) * ((qd1 + dt * x1) * j1_11 + (qd2 + dt * x2) * j2_11 + (qd3 + dt * x3) * j3_11 + (qd4 + dt * x4) * j4_11 + (qd5 + dt * x5) * j5_11 + (qd6 + dt * x6) * j6_11 + (qd7 + dt * x7) * j7_11 + (qd8 + dt * x8) * j8_11 + (qd9 + dt * x9) * j9_11 + (qd10 + dt * x10) * j10_11 + (qd11 + dt * x11) * j11_11 + (qd12+ dt * x12) * j12_11 + (qd13+ dt * x13) * j13_11 + (qd14+ dt * x14) * j14_11 + (qd15+ dt * x15) * j15_11 + (qd16+ dt * x16) * j16_11) + \
-			(qd12 + dt * x12) * ((qd1 + dt * x1) * j1_12 + (qd2 + dt * x2) * j2_12 + (qd3 + dt * x3) * j3_12 + (qd4 + dt * x4) * j4_12 + (qd5 + dt * x5) * j5_12 + (qd6 + dt * x6) * j6_12 + (qd7 + dt * x7) * j7_12 + (qd8 + dt * x8) * j8_12 + (qd9 + dt * x9) * j9_12 + (qd10 + dt * x10) * j10_12 + (qd11 + dt * x11) * j11_12 + (qd12+ dt * x12) * j12_12 + (qd13+ dt * x13) * j13_12 + (qd14+ dt * x14) * j14_12 + (qd15+ dt * x15) * j15_12 + (qd16+ dt * x16) * j16_12) + \
-			(qd13 + dt * x13) * ((qd1 + dt * x1) * j1_13 + (qd2 + dt * x2) * j2_13 + (qd3 + dt * x3) * j3_13 + (qd4 + dt * x4) * j4_13 + (qd5 + dt * x5) * j5_13 + (qd6 + dt * x6) * j6_13 + (qd7 + dt * x7) * j7_13 + (qd8 + dt * x8) * j8_13 + (qd9 + dt * x9) * j9_13 + (qd10 + dt * x10) * j10_13 + (qd11 + dt * x11) * j11_13 + (qd12+ dt * x12) * j12_13 + (qd13+ dt * x13) * j13_13 + (qd14+ dt * x14) * j14_13 + (qd15+ dt * x15) * j15_13 + (qd16+ dt * x16) * j16_13) + \
-			(qd14 + dt * x14) * ((qd1 + dt * x1) * j1_14 + (qd2 + dt * x2) * j2_14 + (qd3 + dt * x3) * j3_14 + (qd4 + dt * x4) * j4_14 + (qd5 + dt * x5) * j5_14 + (qd6 + dt * x6) * j6_11 + (qd7 + dt * x7) * j7_14 + (qd8 + dt * x8) * j8_14 + (qd9 + dt * x9) * j9_14 + (qd10 + dt * x10) * j10_14 + (qd11 + dt * x11) * j11_14 + (qd12+ dt * x12) * j12_14 + (qd13+ dt * x13) * j13_14 + (qd14+ dt * x14) * j14_14 + (qd15+ dt * x15) * j15_14 + (qd16+ dt * x16) * j16_14) + \
-			(qd15 + dt * x15) * ((qd1 + dt * x1) * j1_15 + (qd2 + dt * x2) * j2_15 + (qd3 + dt * x3) * j3_15 + (qd4 + dt * x4) * j4_15 + (qd5 + dt * x5) * j5_15 + (qd6 + dt * x6) * j6_12 + (qd7 + dt * x7) * j7_15 + (qd8 + dt * x8) * j8_15 + (qd9 + dt * x9) * j9_15 + (qd10 + dt * x10) * j10_15 + (qd11 + dt * x11) * j11_15 + (qd12+ dt * x12) * j12_15 + (qd13+ dt * x13) * j13_15 + (qd14+ dt * x14) * j14_15 + (qd15+ dt * x15) * j15_15 + (qd16+ dt * x16) * j16_15) + \
-			(qd16 + dt * x16) * ((qd1 + dt * x1) * j1_16 + (qd2 + dt * x2) * j2_16 + (qd3 + dt * x3) * j3_16 + (qd4 + dt * x4) * j4_16 + (qd5 + dt * x5) * j5_16 + (qd6 + dt * x6) * j6_13 + (qd7 + dt * x7) * j7_16 + (qd8 + dt * x8) * j8_16 + (qd9 + dt * x9) * j9_16 + (qd10 + dt * x10) * j10_16 + (qd11 + dt * x11) * j11_16 + (qd12+ dt * x12) * j12_16 + (qd13+ dt * x13) * j13_16 + (qd14+ dt * x14) * j14_16 + (qd15+ dt * x15) * j15_16 + (qd16+ dt * x16) * j16_16) ;
+		(qd2 + dt * x2) * ((qd1 + dt * x1) * j1_2 + (qd2 + dt * x2) * j2_2 + (qd3 + dt * x3) * j3_2 + (qd4 + dt * x4) * j4_2 + (qd5 + dt * x5) * j5_2 + (qd6 + dt * x6) * j6_2 + (qd7 + dt * x7) * j7_2 + (qd8 + dt * x8) * j8_2 + (qd9 + dt * x9) * j9_2 + (qd10 + dt * x10) * j10_2 + (qd11 + dt * x11) * j11_2 + (qd12+ dt * x12) * j12_2 + (qd13+ dt * x13) * j13_2 + (qd14+ dt * x14) * j14_2 + (qd15+ dt * x15) * j15_2 + (qd16+ dt * x16) * j16_2) + \
+		(qd3 + dt * x3) * ((qd1 + dt * x1) * j1_3 + (qd2 + dt * x2) * j2_3 + (qd3 + dt * x3) * j3_3 + (qd4 + dt * x4) * j4_3 + (qd5 + dt * x5) * j5_3 + (qd6 + dt * x6) * j6_3 + (qd7 + dt * x7) * j7_3 + (qd8 + dt * x8) * j8_3 + (qd9 + dt * x9) * j9_3 + (qd10 + dt * x10) * j10_3 + (qd11 + dt * x11) * j11_3 + (qd12+ dt * x12) * j12_3 + (qd13+ dt * x13) * j13_3 + (qd14+ dt * x14) * j14_3 + (qd15+ dt * x15) * j15_3 + (qd16+ dt * x16) * j16_3) + \
+		(qd4 + dt * x4) * ((qd1 + dt * x1) * j1_4 + (qd2 + dt * x2) * j2_4 + (qd3 + dt * x3) * j3_4 + (qd4 + dt * x4) * j4_4 + (qd5 + dt * x5) * j5_4 + (qd6 + dt * x6) * j6_4 + (qd7 + dt * x7) * j7_4 + (qd8 + dt * x8) * j8_4 + (qd9 + dt * x9) * j9_4 + (qd10 + dt * x10) * j10_4 + (qd11 + dt * x11) * j11_4 + (qd12+ dt * x12) * j12_4 + (qd13+ dt * x13) * j13_4 + (qd14+ dt * x14) * j14_4 + (qd15+ dt * x15) * j15_4 + (qd16+ dt * x16) * j16_4) + \
+		(qd5 + dt * x5) * ((qd1 + dt * x1) * j1_5 + (qd2 + dt * x2) * j2_5 + (qd3 + dt * x3) * j3_5 + (qd4 + dt * x4) * j4_5 + (qd5 + dt * x5) * j5_5 + (qd6 + dt * x6) * j6_5 + (qd7 + dt * x7) * j7_5 + (qd8 + dt * x8) * j8_5 + (qd9 + dt * x9) * j9_5 + (qd10 + dt * x10) * j10_5 + (qd11 + dt * x11) * j11_5 + (qd12+ dt * x12) * j12_5 + (qd13+ dt * x13) * j13_5 + (qd14+ dt * x14) * j14_5 + (qd15+ dt * x15) * j15_5 + (qd16+ dt * x16) * j16_5) + \
+		(qd6 + dt * x6) * ((qd1 + dt * x1) * j1_6 + (qd2 + dt * x2) * j2_6 + (qd3 + dt * x3) * j3_6 + (qd4 + dt * x4) * j4_6 + (qd5 + dt * x5) * j5_6 + (qd6 + dt * x6) * j6_6 + (qd7 + dt * x7) * j7_6 + (qd8 + dt * x8) * j8_6 + (qd9 + dt * x9) * j9_6 + (qd10 + dt * x10) * j10_6 + (qd11 + dt * x11) * j11_6 + (qd12+ dt * x12) * j12_6 + (qd13+ dt * x13) * j13_6 + (qd14+ dt * x14) * j14_6 + (qd15+ dt * x15) * j15_6 + (qd16+ dt * x16) * j16_1) + \
+		(qd7 + dt * x7) * ((qd1 + dt * x1) * j1_7 + (qd2 + dt * x2) * j2_7 + (qd3 + dt * x3) * j3_7 + (qd4 + dt * x4) * j4_7 + (qd5 + dt * x5) * j5_7 + (qd6 + dt * x6) * j6_7 + (qd7 + dt * x7) * j7_7 + (qd8 + dt * x8) * j8_7 + (qd9 + dt * x9) * j9_7 + (qd10 + dt * x10) * j10_7 + (qd11 + dt * x11) * j11_7 + (qd12+ dt * x12) * j12_7 + (qd13+ dt * x13) * j13_7 + (qd14+ dt * x14) * j14_7 + (qd15+ dt * x15) * j15_7 + (qd16+ dt * x16) * j16_1) + \
+		(qd8 + dt * x8) * ((qd1 + dt * x1) * j1_8 + (qd2 + dt * x2) * j2_8 + (qd3 + dt * x3) * j3_8 + (qd4 + dt * x4) * j4_8 + (qd5 + dt * x5) * j5_8 + (qd6 + dt * x6) * j6_8 + (qd7 + dt * x7) * j7_8 + (qd8 + dt * x8) * j8_8 + (qd9 + dt * x9) * j9_8 + (qd10 + dt * x10) * j10_8 + (qd11 + dt * x11) * j11_8 + (qd12+ dt * x12) * j12_8 + (qd13+ dt * x13) * j13_8 + (qd14+ dt * x14) * j14_8 + (qd15+ dt * x15) * j15_8 + (qd16+ dt * x16) * j16_1) + \
+		(qd9 + dt * x9) * ((qd1 + dt * x1) * j1_9 + (qd2 + dt * x2) * j2_9 + (qd3 + dt * x3) * j3_9 + (qd4 + dt * x4) * j4_9 + (qd5 + dt * x5) * j5_9 + (qd6 + dt * x6) * j6_9 + (qd7 + dt * x7) * j7_9 + (qd8 + dt * x8) * j8_9 + (qd9 + dt * x9) * j9_9 + (qd10 + dt * x10) * j10_9 + (qd11 + dt * x11) * j11_9 + (qd12+ dt * x12) * j12_9 + (qd13+ dt * x13) * j13_9 + (qd14+ dt * x14) * j14_9 + (qd15+ dt * x15) * j15_9 + (qd16+ dt * x16) * j16_1) + \
+		(qd10 + dt * x10) * ((qd1 + dt * x1) * j1_10 + (qd2 + dt * x2) * j2_10 + (qd3 + dt * x3) * j3_10 + (qd4 + dt * x4) * j4_10 + (qd5 + dt * x5) * j5_10 + (qd6 + dt * x6) * j6_10 + (qd7 + dt * x7) * j7_10 + (qd8 + dt * x8) * j8_10 + (qd9 + dt * x9) * j9_10 + (qd10 + dt * x10) * j10_10 + (qd11 + dt * x11) * j11_10 + (qd12+ dt * x12) * j12_10 + (qd13+ dt * x13) * j13_10 + (qd14+ dt * x14) * j14_10 + (qd15+ dt * x15) * j15_10 + (qd16+ dt * x16) * j16_10) + \
+		(qd11 + dt * x11) * ((qd1 + dt * x1) * j1_11 + (qd2 + dt * x2) * j2_11 + (qd3 + dt * x3) * j3_11 + (qd4 + dt * x4) * j4_11 + (qd5 + dt * x5) * j5_11 + (qd6 + dt * x6) * j6_11 + (qd7 + dt * x7) * j7_11 + (qd8 + dt * x8) * j8_11 + (qd9 + dt * x9) * j9_11 + (qd10 + dt * x10) * j10_11 + (qd11 + dt * x11) * j11_11 + (qd12+ dt * x12) * j12_11 + (qd13+ dt * x13) * j13_11 + (qd14+ dt * x14) * j14_11 + (qd15+ dt * x15) * j15_11 + (qd16+ dt * x16) * j16_11) + \
+		(qd12 + dt * x12) * ((qd1 + dt * x1) * j1_12 + (qd2 + dt * x2) * j2_12 + (qd3 + dt * x3) * j3_12 + (qd4 + dt * x4) * j4_12 + (qd5 + dt * x5) * j5_12 + (qd6 + dt * x6) * j6_12 + (qd7 + dt * x7) * j7_12 + (qd8 + dt * x8) * j8_12 + (qd9 + dt * x9) * j9_12 + (qd10 + dt * x10) * j10_12 + (qd11 + dt * x11) * j11_12 + (qd12+ dt * x12) * j12_12 + (qd13+ dt * x13) * j13_12 + (qd14+ dt * x14) * j14_12 + (qd15+ dt * x15) * j15_12 + (qd16+ dt * x16) * j16_12) + \
+		(qd13 + dt * x13) * ((qd1 + dt * x1) * j1_13 + (qd2 + dt * x2) * j2_13 + (qd3 + dt * x3) * j3_13 + (qd4 + dt * x4) * j4_13 + (qd5 + dt * x5) * j5_13 + (qd6 + dt * x6) * j6_13 + (qd7 + dt * x7) * j7_13 + (qd8 + dt * x8) * j8_13 + (qd9 + dt * x9) * j9_13 + (qd10 + dt * x10) * j10_13 + (qd11 + dt * x11) * j11_13 + (qd12+ dt * x12) * j12_13 + (qd13+ dt * x13) * j13_13 + (qd14+ dt * x14) * j14_13 + (qd15+ dt * x15) * j15_13 + (qd16+ dt * x16) * j16_13) + \
+		(qd14 + dt * x14) * ((qd1 + dt * x1) * j1_14 + (qd2 + dt * x2) * j2_14 + (qd3 + dt * x3) * j3_14 + (qd4 + dt * x4) * j4_14 + (qd5 + dt * x5) * j5_14 + (qd6 + dt * x6) * j6_11 + (qd7 + dt * x7) * j7_14 + (qd8 + dt * x8) * j8_14 + (qd9 + dt * x9) * j9_14 + (qd10 + dt * x10) * j10_14 + (qd11 + dt * x11) * j11_14 + (qd12+ dt * x12) * j12_14 + (qd13+ dt * x13) * j13_14 + (qd14+ dt * x14) * j14_14 + (qd15+ dt * x15) * j15_14 + (qd16+ dt * x16) * j16_14) + \
+		(qd15 + dt * x15) * ((qd1 + dt * x1) * j1_15 + (qd2 + dt * x2) * j2_15 + (qd3 + dt * x3) * j3_15 + (qd4 + dt * x4) * j4_15 + (qd5 + dt * x5) * j5_15 + (qd6 + dt * x6) * j6_12 + (qd7 + dt * x7) * j7_15 + (qd8 + dt * x8) * j8_15 + (qd9 + dt * x9) * j9_15 + (qd10 + dt * x10) * j10_15 + (qd11 + dt * x11) * j11_15 + (qd12+ dt * x12) * j12_15 + (qd13+ dt * x13) * j13_15 + (qd14+ dt * x14) * j14_15 + (qd15+ dt * x15) * j15_15 + (qd16+ dt * x16) * j16_15) + \
+		(qd16 + dt * x16) * ((qd1 + dt * x1) * j1_16 + (qd2 + dt * x2) * j2_16 + (qd3 + dt * x3) * j3_16 + (qd4 + dt * x4) * j4_16 + (qd5 + dt * x5) * j5_16 + (qd6 + dt * x6) * j6_13 + (qd7 + dt * x7) * j7_16 + (qd8 + dt * x8) * j8_16 + (qd9 + dt * x9) * j9_16 + (qd10 + dt * x10) * j10_16 + (qd11 + dt * x11) * j11_16 + (qd12+ dt * x12) * j12_16 + (qd13+ dt * x13) * j13_16 + (qd14+ dt * x14) * j14_16 + (qd15+ dt * x15) * j15_16 + (qd16+ dt * x16) * j16_16) ;
 
 	sF[0] = -sF[0];
-
-	//std::cout << sF[0] << std::endl;
-
-
-
-	/* Cvector joint_acc(38) ;
-
-	 */
-
 
 	pos[0] = q1 ;
 	pos[1] = q2 ;
@@ -621,13 +656,7 @@ void iCubOpt::W_STATIC_shot(const double sx[], double sF[],  double sG[] )
 
 	iCubModel.set_state(0, pos, vel);
 	//iCubModel.set_acc(joint_acc) ;
-	Cvector3 com =  iCubModel.get_cm()  ;
-
-	com_x = com[0] ;
-	com_y = com[1] ;
-
-	/*  pos[77] = com_x ;
-    pos[78] = com_y ;*/
+	
 	// 11 is the index of palm (end effector)
 	end_pos = iCubModel.get_pos(11, Cvector3(0,0,0));
 	// std::cout << "Initial Position = " << end_pos.transpose() << std::endl;
@@ -637,6 +666,7 @@ void iCubOpt::W_STATIC_shot(const double sx[], double sF[],  double sG[] )
 	double diff_norm = sqrt( diff[0]*diff[0] + diff[1]*diff[1] + diff[2]*diff[2] );
 	diff = diff / diff_norm ;
 
+	// Constraints on joint angles
 	sF[1] =  q1 + dt * ( qd1 + dt * x1 );
 	sF[2] =  q2 + dt * ( qd2 + dt * x2 );
 	sF[3] =  q3 + dt * ( qd3 + dt * x3 );
@@ -716,15 +746,10 @@ void iCubOpt::W_STATIC_shot(const double sx[], double sF[],  double sG[] )
 	sF[75] =  qd37 + dt * x37 ;
 	sF[76] =  qd38 + dt * x38 ;
 
-
-
-
 	for (unsigned int i=0;i<38;++i)
 	{
 		pos_new(i)=sF[i+1] ;
 	}
-
-
 
 	for (unsigned int i=0;i<38;++i)
 	{
@@ -737,8 +762,17 @@ void iCubOpt::W_STATIC_shot(const double sx[], double sF[],  double sG[] )
 
 	iCubModel.set_state(0, pos_new, vel_new);
 	end_vel = iCubModel.get_vel(11, Cvector3(0,0,0));
+	
+	/*
+	Cvector3 com =  iCubModel.get_cm()  ;
 
+	com_x = com[0] ;
+	com_y = com[1] ;
 
+	sF[77] = com_x ;
+        sF[78] = com_y ;
+	 */
+	
 	//  std::cout << "New q = "<< pos_new.transpose() << std::endl;
 	//  std::cout << "vel_new = "<< vel_new.transpose() << std::endl;
 	// std::cout << "Next Velocity = "<< end_vel.transpose() << std::endl;
@@ -757,13 +791,9 @@ void iCubOpt::W_STATIC_shot(const double sx[], double sF[],  double sG[] )
 	double dir_norm = sqrt( dir_cons[0]*dir_cons[0] + dir_cons[1]*dir_cons[1] + dir_cons[2]*dir_cons[2] );
 	// std::cout << "Direction_norm = " << dir_norm <<std::endl ;
 
-	//sF[0] =  -vel_norm ;
-
-
 
 	sF[1]=  dir_norm ;
-	//  sF[1]=  0.2 ;
-	//    std::cout << "cost  = " << sF[0] <<std::endl ;
+
 
 
 
