@@ -25,12 +25,15 @@ void iCubOpt::W_STATIC_delete()
 	delete W_STATIC_vars.snopt;
 } 
 
+
+// This function is implemented ONLY in the first step of optimization, so its initial condition is defined by user.
 void iCubOpt::W_STATIC_init()
 { 
-	W_STATIC_vars.num_var = 38;
-	W_STATIC_vars.num_eq = 2 ; //80; //39;//77;
-	W_STATIC_vars.num_deriv = 54 ; //281;//168;// 54 ;//92;  //number of non-zero elements of Gradient Matrix
-	W_STATIC_vars.ObjRow  = 0;
+	W_STATIC_vars.num_var = 38;   // number of optimization variables
+	// total number of equations for cost function and constraints. Note: constrains on opt. variables are not included here.
+	W_STATIC_vars.num_eq = 2 ; //80; //39;//77;   
+	W_STATIC_vars.num_deriv = 54 ; //281;//168; //54 ;//92;  //number of non-zero elements of Gradient Matrix
+	W_STATIC_vars.ObjRow  = 0;    
 	W_STATIC_vars.ObjAdd  = 0; //
 
 	W_STATIC_vars.snopt = new snoptProblemA("W_STATIC","");
@@ -40,6 +43,11 @@ void iCubOpt::W_STATIC_init()
 
 	snopt_allocate_space(W_STATIC_vars);
 
+	// set the initial condition, upper and lower band for optimization variable (joint acceleration)
+	// Note: Upper and lower band for joints acceleration should be modified. 
+	
+	// Note: First six variables are related to six DOF of root link. 
+	// Note: Here, it's assumed that root link is fixed. So, upper and lower band for it's acceleration (and velocity) are close to zero.
 	W_STATIC_vars.xlow[0]= -1.000000e-08; W_STATIC_vars.x0[0]= 0.000000; W_STATIC_vars.xupp[0]= 1.000000e-08; W_STATIC_vars.xstate[0]= 0;
 	W_STATIC_vars.xlow[1]= -1.000000e-08; W_STATIC_vars.x0[1]= 0.000000; W_STATIC_vars.xupp[1]= 1.000000e-08; W_STATIC_vars.xstate[1]= 0;
 	W_STATIC_vars.xlow[2]= -1.000000e-08; W_STATIC_vars.x0[2]= 0.000000; W_STATIC_vars.xupp[2]= 1.000000e-08; W_STATIC_vars.xstate[2]= 0;
@@ -49,7 +57,7 @@ void iCubOpt::W_STATIC_init()
 
 	/// torso
 
-	W_STATIC_vars.xlow[6]= -24;	 	 W_STATIC_vars.x0[6]= 0.000000; W_STATIC_vars.xupp[6]= 24; 	  W_STATIC_vars.xstate[6]= 0;
+	W_STATIC_vars.xlow[6]= -24;	 W_STATIC_vars.x0[6]= 0.000000; W_STATIC_vars.xupp[6]= 24;    W_STATIC_vars.xstate[6]= 0;
 	W_STATIC_vars.xlow[7]= -24;  	 W_STATIC_vars.x0[7]= 0.000000; W_STATIC_vars.xupp[7]= 24;    W_STATIC_vars.xstate[7]= 0;
 	W_STATIC_vars.xlow[8]= -24;  	 W_STATIC_vars.x0[8]= 0.000000; W_STATIC_vars.xupp[8]= 24;    W_STATIC_vars.xstate[8]= 0;
 
@@ -75,9 +83,7 @@ void iCubOpt::W_STATIC_init()
 
 	//// right body
 
-
-
-	W_STATIC_vars.xlow[22]= -12;      W_STATIC_vars.x0[22]= 0.000000;   W_STATIC_vars.xupp[22]= 12; 	W_STATIC_vars.xstate[22]= 0;
+	W_STATIC_vars.xlow[22]= -12;      W_STATIC_vars.x0[22]= 0.000000;  W_STATIC_vars.xupp[22]= 12; W_STATIC_vars.xstate[22]= 0;
 	W_STATIC_vars.xlow[23]= -12 ;     W_STATIC_vars.x0[23]= 0.000000;  W_STATIC_vars.xupp[23]= 12;   W_STATIC_vars.xstate[23]= 0;
 	W_STATIC_vars.xlow[24]= -12 ;     W_STATIC_vars.x0[24]= 0.000000;  W_STATIC_vars.xupp[24]= 12;   W_STATIC_vars.xstate[24]= 0;
 
@@ -103,12 +109,14 @@ void iCubOpt::W_STATIC_init()
 
 
 	/////////////////////////////////
+	// F(0) is the equation of cost function (left end-effector velocity)
 
-	W_STATIC_vars.Flow[0]= -1.000000e+20; W_STATIC_vars.Fupp[0]= 1.000000e+20;  // cost function
+	W_STATIC_vars.Flow[0]= -1.000000e+20; W_STATIC_vars.Fupp[0]= 1.000000e+20;  
 
-	// constraints on angles (6 constraints on base link + constrains on joint angeles)
+	// Equation F(1) to F(38) are related to constraints on joints angles. Upper and lower magnitude of joint angles are written based on iCub SDF file. 
 
-	/*	W_STATIC_vars.Flow[1]= -1.000000e+20; W_STATIC_vars.Fupp[1]= 1.000000e+20;  // root link
+	/*	
+	W_STATIC_vars.Flow[1]= -1.000000e+20; W_STATIC_vars.Fupp[1]= 1.000000e+20;  // root link
 	W_STATIC_vars.Flow[2]= -1.000000e+20; W_STATIC_vars.Fupp[2]= 1.000000e+20;
 	W_STATIC_vars.Flow[3]= -1.000000e+20; W_STATIC_vars.Fupp[3]= 1.000000e+20;
 	W_STATIC_vars.Flow[4]= -1.000000e+20; W_STATIC_vars.Fupp[4]= 1.000000e+20;
@@ -159,7 +167,7 @@ void iCubOpt::W_STATIC_init()
 	W_STATIC_vars.Flow[37]= -0.349066; W_STATIC_vars.Fupp[37]= 0.349066;
 	W_STATIC_vars.Flow[38]= -0.767945; W_STATIC_vars.Fupp[38]= 0.767945;
 
-	// constraints on velocity
+	// Equation F(39) to F(76) are related to constraints on joints velocity. 
 
 	for (unsigned int i = 39; i < 45; i++ )
 	{
@@ -173,285 +181,52 @@ void iCubOpt::W_STATIC_init()
 		W_STATIC_vars.Fupp[i]= 0.785;
 	}*/
 
+	//  Equation F(77) is related to direction of velocity in the next step
+	// In order to see the effect of this constraint, we removed all other constraint.
+	// To solve the general problem, uncomment all above bands (from F(1) to F(38)) and modify the index of the following band:
 	W_STATIC_vars.Flow[1]= -2.000000e-01; W_STATIC_vars.Fupp[1]= 2.000000e-01;
-	///
-
-	W_STATIC_vars.iGfun[0] = 0 ;
-	W_STATIC_vars.jGvar[0] = 0 ;
-
-	W_STATIC_vars.iGfun[1] = 0 ;
-	W_STATIC_vars.jGvar[1] = 1 ;
-
-	W_STATIC_vars.iGfun[2] = 0 ;
-	W_STATIC_vars.jGvar[2] = 2 ;
-
-	W_STATIC_vars.iGfun[3] = 0 ;
-	W_STATIC_vars.jGvar[3] = 3 ;
-
-	W_STATIC_vars.iGfun[4] = 0 ;
-	W_STATIC_vars.jGvar[4] = 4 ;
-
-	W_STATIC_vars.iGfun[5] = 0 ;
-	W_STATIC_vars.jGvar[5] = 5 ;
-
-	W_STATIC_vars.iGfun[6] = 0 ;
-	W_STATIC_vars.jGvar[6] = 6 ;
-
-	W_STATIC_vars.iGfun[7] = 0 ;
-	W_STATIC_vars.jGvar[7] = 7 ;
-
-	W_STATIC_vars.iGfun[8] = 0 ;
-	W_STATIC_vars.jGvar[8] = 8 ;
-
-	W_STATIC_vars.iGfun[9] = 0 ;
-	W_STATIC_vars.jGvar[9] = 9 ;
-
-	W_STATIC_vars.iGfun[10] = 0 ;
-	W_STATIC_vars.jGvar[10] = 10 ;
-
-	W_STATIC_vars.iGfun[11] = 0 ;
-	W_STATIC_vars.jGvar[11] = 11 ;
-
-	W_STATIC_vars.iGfun[12] = 0 ;
-	W_STATIC_vars.jGvar[12] = 12 ;
-
-	W_STATIC_vars.iGfun[13] = 0 ;
-	W_STATIC_vars.jGvar[13] = 13 ;
-
-	W_STATIC_vars.iGfun[14] = 0 ;
-	W_STATIC_vars.jGvar[14] = 14 ;
-
-	W_STATIC_vars.iGfun[15] = 0 ;
-	W_STATIC_vars.jGvar[15] = 15 ;
-
-	/*W_STATIC_vars.iGfun[16] = 1 ;
-	W_STATIC_vars.jGvar[16] = 0 ;
-
-	W_STATIC_vars.iGfun[17] = 2 ;
-	W_STATIC_vars.jGvar[17] = 1 ;
-
-	W_STATIC_vars.iGfun[18] = 3 ;
-	W_STATIC_vars.jGvar[18] = 2 ;
-
-	W_STATIC_vars.iGfun[19] = 4 ;
-	W_STATIC_vars.jGvar[19] = 3 ;
-
-	W_STATIC_vars.iGfun[20] = 5 ;
-	W_STATIC_vars.jGvar[20] = 4 ;
-
-	W_STATIC_vars.iGfun[21] = 6 ;
-	W_STATIC_vars.jGvar[21] = 5 ;
-
-	W_STATIC_vars.iGfun[22] = 7 ;
-	W_STATIC_vars.jGvar[22] = 6 ;
-
-	W_STATIC_vars.iGfun[23] = 8 ;
-	W_STATIC_vars.jGvar[23] = 7 ;
-
-	W_STATIC_vars.iGfun[24] = 9 ;
-	W_STATIC_vars.jGvar[24] = 8 ;
-
-	W_STATIC_vars.iGfun[25] = 10 ;
-	W_STATIC_vars.jGvar[25] = 9 ;
-
-	W_STATIC_vars.iGfun[26] = 11 ;
-	W_STATIC_vars.jGvar[26] = 10 ;
-
-	W_STATIC_vars.iGfun[27] = 12 ;
-	W_STATIC_vars.jGvar[27] = 11 ;
-
-	W_STATIC_vars.iGfun[28] = 13 ;
-	W_STATIC_vars.jGvar[28] = 12 ;
-
-	W_STATIC_vars.iGfun[29] = 14 ;
-	W_STATIC_vars.jGvar[29] = 13 ;
-
-	W_STATIC_vars.iGfun[30] = 15 ;
-	W_STATIC_vars.jGvar[30] = 14 ;
-
-	W_STATIC_vars.iGfun[31] = 16 ;
-	W_STATIC_vars.jGvar[31] = 15 ;
-
-	W_STATIC_vars.iGfun[32] = 17 ;
-	W_STATIC_vars.jGvar[32] = 16 ;
-
-	W_STATIC_vars.iGfun[33] = 18 ;
-	W_STATIC_vars.jGvar[33] = 17 ;
-
-	W_STATIC_vars.iGfun[34] = 19 ;
-	W_STATIC_vars.jGvar[34] = 18 ;
-
-	W_STATIC_vars.iGfun[35] = 20 ;
-	W_STATIC_vars.jGvar[35] = 19 ;
-
-	W_STATIC_vars.iGfun[36] = 21 ;
-	W_STATIC_vars.jGvar[36] = 20 ;
-
-	W_STATIC_vars.iGfun[37] = 22 ;
-	W_STATIC_vars.jGvar[37] = 21 ;
-
-	W_STATIC_vars.iGfun[38] = 23 ;
-	W_STATIC_vars.jGvar[38] = 22 ;
-
-	W_STATIC_vars.iGfun[39] = 24 ;
-	W_STATIC_vars.jGvar[39] = 23 ;
-
-	W_STATIC_vars.iGfun[40] = 25 ;
-	W_STATIC_vars.jGvar[40] = 24 ;
-
-	W_STATIC_vars.iGfun[41] = 26 ;
-	W_STATIC_vars.jGvar[41] = 25 ;
-
-	W_STATIC_vars.iGfun[42] = 27 ;
-	W_STATIC_vars.jGvar[42] = 26 ;
-
-	W_STATIC_vars.iGfun[43] = 28 ;
-	W_STATIC_vars.jGvar[43] = 27 ;
-
-	W_STATIC_vars.iGfun[44] = 29 ;
-	W_STATIC_vars.jGvar[44] = 28 ;
-
-	W_STATIC_vars.iGfun[45] = 30 ;
-	W_STATIC_vars.jGvar[45] = 29 ;
-
-	W_STATIC_vars.iGfun[46] = 31 ;
-	W_STATIC_vars.jGvar[46] = 30 ;
-
-	W_STATIC_vars.iGfun[47] = 32 ;
-	W_STATIC_vars.jGvar[47] = 31 ;
-
-	W_STATIC_vars.iGfun[48] = 33 ;
-	W_STATIC_vars.jGvar[48] = 32 ;
-
-	W_STATIC_vars.iGfun[49] = 34 ;
-	W_STATIC_vars.jGvar[49] = 33 ;
-
-	W_STATIC_vars.iGfun[50] = 35 ;
-	W_STATIC_vars.jGvar[50] = 34 ;
-
-	W_STATIC_vars.iGfun[51] = 36 ;
-	W_STATIC_vars.jGvar[51] = 35 ;
-
-	W_STATIC_vars.iGfun[52] = 37 ;
-	W_STATIC_vars.jGvar[52] = 36 ;
-
-	W_STATIC_vars.iGfun[53] = 38 ;
-	W_STATIC_vars.jGvar[53] = 37 ;
-	/////
-	W_STATIC_vars.iGfun[54] = 39 ;
-	W_STATIC_vars.jGvar[54] = 0 ;
-
-	W_STATIC_vars.iGfun[55] = 40 ;
-	W_STATIC_vars.jGvar[55] = 1 ;
-
-	W_STATIC_vars.iGfun[56] = 41 ;
-	W_STATIC_vars.jGvar[56] = 2 ;
-
-	W_STATIC_vars.iGfun[57] = 42 ;
-	W_STATIC_vars.jGvar[57] = 3 ;
-
-	W_STATIC_vars.iGfun[58] = 43 ;
-	W_STATIC_vars.jGvar[58] = 4 ;
-
-	W_STATIC_vars.iGfun[59] = 44 ;
-	W_STATIC_vars.jGvar[59] = 5 ;
-
-	W_STATIC_vars.iGfun[60] = 45 ;
-	W_STATIC_vars.jGvar[60] = 6 ;
-
-	W_STATIC_vars.iGfun[61] = 46 ;
-	W_STATIC_vars.jGvar[61] = 7 ;
-
-	W_STATIC_vars.iGfun[62] = 47 ;
-	W_STATIC_vars.jGvar[62] = 8 ;
-
-	W_STATIC_vars.iGfun[63] = 48 ;
-	W_STATIC_vars.jGvar[63] = 9 ;
-
-	W_STATIC_vars.iGfun[64] = 49 ;
-	W_STATIC_vars.jGvar[64] = 10 ;
-
-	W_STATIC_vars.iGfun[65] = 50 ;
-	W_STATIC_vars.jGvar[65] = 11 ;
-
-	W_STATIC_vars.iGfun[66] = 51 ;
-	W_STATIC_vars.jGvar[66] = 12 ;
-
-	W_STATIC_vars.iGfun[67] = 52 ;
-	W_STATIC_vars.jGvar[67] = 13 ;
-
-	W_STATIC_vars.iGfun[68] = 53 ;
-	W_STATIC_vars.jGvar[68] = 14 ;
-
-	W_STATIC_vars.iGfun[69] = 54 ;
-	W_STATIC_vars.jGvar[69] = 15 ;
-
-	W_STATIC_vars.iGfun[70] = 55 ;
-	W_STATIC_vars.jGvar[70] = 16 ;
-
-	W_STATIC_vars.iGfun[71] = 56 ;
-	W_STATIC_vars.jGvar[71] = 17 ;
-
-	W_STATIC_vars.iGfun[72] = 57 ;
-	W_STATIC_vars.jGvar[72] = 18 ;
-
-	W_STATIC_vars.iGfun[73] = 58 ;
-	W_STATIC_vars.jGvar[73] = 19 ;
-
-	W_STATIC_vars.iGfun[74] = 59 ;
-	W_STATIC_vars.jGvar[74] = 20 ;
-
-	W_STATIC_vars.iGfun[75] = 60 ;
-	W_STATIC_vars.jGvar[75] = 21 ;
-
-	W_STATIC_vars.iGfun[76] = 61 ;
-	W_STATIC_vars.jGvar[76] = 22 ;
-
-	W_STATIC_vars.iGfun[77] = 62 ;
-	W_STATIC_vars.jGvar[77] = 23 ;
-
-	W_STATIC_vars.iGfun[78] = 63 ;
-	W_STATIC_vars.jGvar[78] = 24 ;
-
-	W_STATIC_vars.iGfun[79] = 64 ;
-	W_STATIC_vars.jGvar[79] = 25 ;
-
-	W_STATIC_vars.iGfun[80] = 65 ;
-	W_STATIC_vars.jGvar[80] = 26 ;
-
-	W_STATIC_vars.iGfun[81] = 66 ;
-	W_STATIC_vars.jGvar[81] = 27 ;
-
-	W_STATIC_vars.iGfun[82] = 67 ;
-	W_STATIC_vars.jGvar[82] = 28 ;
-
-	W_STATIC_vars.iGfun[83] = 68 ;
-	W_STATIC_vars.jGvar[83] = 29 ;
-
-	W_STATIC_vars.iGfun[84] = 69 ;
-	W_STATIC_vars.jGvar[84] = 30 ;
-
-	W_STATIC_vars.iGfun[85] = 70 ;
-	W_STATIC_vars.jGvar[85] = 31 ;
-
-	W_STATIC_vars.iGfun[86] = 71 ;
-	W_STATIC_vars.jGvar[86] = 32 ;
-
-	W_STATIC_vars.iGfun[87] = 72 ;
-	W_STATIC_vars.jGvar[87] = 33 ;
-
-	W_STATIC_vars.iGfun[88] = 73 ;
-	W_STATIC_vars.jGvar[88] = 34 ;
-
-	W_STATIC_vars.iGfun[89] = 74 ;
-	W_STATIC_vars.jGvar[89] = 35 ;
-
-	W_STATIC_vars.iGfun[90] = 75 ;
-	W_STATIC_vars.jGvar[90] = 36 ;
-
-	W_STATIC_vars.iGfun[91] = 76 ;
-	W_STATIC_vars.jGvar[91] = 37 ;
-
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Patern of non-zero elements of gradient matrxi should be defined. Since the velocity of left end-effector is function of left upper body,.. 
+	// so, the first row of gradient matrix has 16 non-zero elements. (root link(6)+torso(3)+left shoulder(3)+left elbow(1)+left wrist(3))
+
+	// This loop defines the patern of elements in the first row (iGfun=0) of gradient matrix
+	for (unsigned int i = 0 ; i < 16 ; ++i)
+	{
+		W_STATIC_vars.iGfun[i] = 0 ;    // row index
+		W_STATIC_vars.jGvar[i] = i ;   // column index
+	}
+	
+	/*
+	// This loop defines the patern of elements from i=16 to i=53 which are related to the equation of constraints on joint angles.
+	// For joint angle constraints: iGfun=1 to 38 
+	// Each row has one non-zero element
+	
+	int k = 1 ;
+	for (unsigned int i = 16 ; i < 54 ; ++i)
+	{
+		W_STATIC_vars.iGfun[i] = k ;    // row index
+		W_STATIC_vars.jGvar[i] = k - 1 ;   // column index
+		k = k + 1 ;
+	}
+	
+	// This loop defines the patern of elements from i=54 to i=91 which are related to the equation of constraints on joint velocity.
+	// For velocity constraints: iGfun=39 to 76 
+	// Each row has one non-zero element
+	
+	int kk = 39 ;
+	for (unsigned int i = 54 ; i < 92 ; ++i)
+	{
+		W_STATIC_vars.iGfun[i] = kk ;    // row index
+		W_STATIC_vars.jGvar[i] = kk - 39 ;   // column index
+		kk = kk + 1 ;
+	}
+	
+	
+	// This loop defines the patern of elements from i=92 to i=107 which are related to the equation of constraint on center of mass. 
+	// For center of mass constraint: iGfun=77 
+	
 	int kk = 0 ;
 	for (unsigned int k = 92; k<108 ; ++k )
 	{
@@ -460,7 +235,9 @@ void iCubOpt::W_STATIC_init()
 		kk = kk + 1 ;
 	}*/
 
-
+	//This loop defines the patern of elements related to the equation of constraint on velocity direction.
+	// In order to see the effect of this constraint, we removed all other constraint.
+	// To solve the general problem, uncomment all above loops and modify the indices of the following loop
 	int kk = 0 ;
 	for (unsigned int i = 16 ; i<54 ; ++i)
 	{
@@ -472,7 +249,7 @@ void iCubOpt::W_STATIC_init()
 	snopt_load_vars_full(W_STATIC_vars);
 } 
 
-
+// This function is exactly like the above function (W_STATIC_init) except than initial conditions which come from previous step
 void iCubOpt::W_STATIC_update(double x[])
 {
 	W_STATIC_vars.num_var = 38;
@@ -497,7 +274,7 @@ void iCubOpt::W_STATIC_update(double x[])
 
 	/// torso
 
-	W_STATIC_vars.xlow[6]= -24;	 	 W_STATIC_vars.x0[6]= x[6]; W_STATIC_vars.xupp[6]= 24; 	  W_STATIC_vars.xstate[6]= 0;
+	W_STATIC_vars.xlow[6]= -24;	 W_STATIC_vars.x0[6]= x[6]; W_STATIC_vars.xupp[6]= 24; 	  W_STATIC_vars.xstate[6]= 0;
 	W_STATIC_vars.xlow[7]= -24;  	 W_STATIC_vars.x0[7]= x[7]; W_STATIC_vars.xupp[7]= 24;    W_STATIC_vars.xstate[7]= 0;
 	W_STATIC_vars.xlow[8]= -24;  	 W_STATIC_vars.x0[8]= x[8]; W_STATIC_vars.xupp[8]= 24;    W_STATIC_vars.xstate[8]= 0;
 
@@ -521,7 +298,6 @@ void iCubOpt::W_STATIC_update(double x[])
 	W_STATIC_vars.xlow[21]= -40;     W_STATIC_vars.x0[21]= x[21]; W_STATIC_vars.xupp[21]= 40;     W_STATIC_vars.xstate[21]= 0;
 
 	//// right body
-
 
 	W_STATIC_vars.xlow[22]= -12;      W_STATIC_vars.x0[22]= x[22];   W_STATIC_vars.xupp[22]= 12; 	W_STATIC_vars.xstate[22]= 0;
 	W_STATIC_vars.xlow[23]= -12 ;     W_STATIC_vars.x0[23]= x[23];  W_STATIC_vars.xupp[23]= 12;   W_STATIC_vars.xstate[23]= 0;
@@ -549,11 +325,15 @@ void iCubOpt::W_STATIC_update(double x[])
 
 	/////////////////////////////////
 
-	W_STATIC_vars.Flow[0]= -1.000000e+20; W_STATIC_vars.Fupp[0]= 1.000000e+20;  // cost function
+	/////////////////////////////////
+	// F(0) is the equation of cost function (left end-effector velocity)
 
-	// constraints on angles (6 constraints on base link + constrains on joint angeles)
+	W_STATIC_vars.Flow[0]= -1.000000e+20; W_STATIC_vars.Fupp[0]= 1.000000e+20;  
 
-	/*	W_STATIC_vars.Flow[1]= -1.000000e+20; W_STATIC_vars.Fupp[1]= 1.000000e+20;  // root link
+	// Equation F(1) to F(38) are related to constraints on joints angles. Upper and lower magnitude of joint angles are written based on iCub SDF file. 
+
+	/*	
+	W_STATIC_vars.Flow[1]= -1.000000e+20; W_STATIC_vars.Fupp[1]= 1.000000e+20;  // root link
 	W_STATIC_vars.Flow[2]= -1.000000e+20; W_STATIC_vars.Fupp[2]= 1.000000e+20;
 	W_STATIC_vars.Flow[3]= -1.000000e+20; W_STATIC_vars.Fupp[3]= 1.000000e+20;
 	W_STATIC_vars.Flow[4]= -1.000000e+20; W_STATIC_vars.Fupp[4]= 1.000000e+20;
@@ -604,7 +384,7 @@ void iCubOpt::W_STATIC_update(double x[])
 	W_STATIC_vars.Flow[37]= -0.349066; W_STATIC_vars.Fupp[37]= 0.349066;
 	W_STATIC_vars.Flow[38]= -0.767945; W_STATIC_vars.Fupp[38]= 0.767945;
 
-	// constraints on velocity
+	// Equation F(39) to F(76) are related to constraints on joints velocity. 
 
 	for (unsigned int i = 39; i < 45; i++ )
 	{
@@ -618,296 +398,63 @@ void iCubOpt::W_STATIC_update(double x[])
 		W_STATIC_vars.Fupp[i]= 0.785;
 	}*/
 
+	//  Equation F(77) is related to direction of velocity in the next step
+	// In order to see the effect of this constraint, we removed all other constraint.
+	// To solve the general problem, uncomment all above bands (from F(1) to F(38)) and modify the index of the following band:
 	W_STATIC_vars.Flow[1]= -2.000000e-01; W_STATIC_vars.Fupp[1]= 2.000000e-01;
-	///
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Patern of non-zero elements of gradient matrxi should be defined. Since the velocity of left end-effector is function of left upper body,.. 
+	// so, the first row of gradient matrix has 16 non-zero elements. (root link(6)+torso(3)+left shoulder(3)+left elbow(1)+left wrist(3))
 
-	W_STATIC_vars.iGfun[0] = 0 ;
-	W_STATIC_vars.jGvar[0] = 0 ;
-
-	W_STATIC_vars.iGfun[1] = 0 ;
-	W_STATIC_vars.jGvar[1] = 1 ;
-
-	W_STATIC_vars.iGfun[2] = 0 ;
-	W_STATIC_vars.jGvar[2] = 2 ;
-
-	W_STATIC_vars.iGfun[3] = 0 ;
-	W_STATIC_vars.jGvar[3] = 3 ;
-
-	W_STATIC_vars.iGfun[4] = 0 ;
-	W_STATIC_vars.jGvar[4] = 4 ;
-
-	W_STATIC_vars.iGfun[5] = 0 ;
-	W_STATIC_vars.jGvar[5] = 5 ;
-
-	W_STATIC_vars.iGfun[6] = 0 ;
-	W_STATIC_vars.jGvar[6] = 6 ;
-
-	W_STATIC_vars.iGfun[7] = 0 ;
-	W_STATIC_vars.jGvar[7] = 7 ;
-
-	W_STATIC_vars.iGfun[8] = 0 ;
-	W_STATIC_vars.jGvar[8] = 8 ;
-
-	W_STATIC_vars.iGfun[9] = 0 ;
-	W_STATIC_vars.jGvar[9] = 9 ;
-
-	W_STATIC_vars.iGfun[10] = 0 ;
-	W_STATIC_vars.jGvar[10] = 10 ;
-
-	W_STATIC_vars.iGfun[11] = 0 ;
-	W_STATIC_vars.jGvar[11] = 11 ;
-
-	W_STATIC_vars.iGfun[12] = 0 ;
-	W_STATIC_vars.jGvar[12] = 12 ;
-
-	W_STATIC_vars.iGfun[13] = 0 ;
-	W_STATIC_vars.jGvar[13] = 13 ;
-
-	W_STATIC_vars.iGfun[14] = 0 ;
-	W_STATIC_vars.jGvar[14] = 14 ;
-
-	W_STATIC_vars.iGfun[15] = 0 ;
-	W_STATIC_vars.jGvar[15] = 15 ;
-
+	// This loop defines the patern of elements in the first row (iGfun=0) of gradient matrix
+	for (unsigned int i = 0 ; i < 16 ; ++i)
+	{
+		W_STATIC_vars.iGfun[i] = 0 ;    // row index
+		W_STATIC_vars.jGvar[i] = i ;   // column index
+	}
+	
 	/*
-	W_STATIC_vars.iGfun[16] = 1 ;
-	W_STATIC_vars.jGvar[16] = 0 ;
-
-	W_STATIC_vars.iGfun[17] = 2 ;
-	W_STATIC_vars.jGvar[17] = 1 ;
-
-	W_STATIC_vars.iGfun[18] = 3 ;
-	W_STATIC_vars.jGvar[18] = 2 ;
-
-	W_STATIC_vars.iGfun[19] = 4 ;
-	W_STATIC_vars.jGvar[19] = 3 ;
-
-	W_STATIC_vars.iGfun[20] = 5 ;
-	W_STATIC_vars.jGvar[20] = 4 ;
-
-	W_STATIC_vars.iGfun[21] = 6 ;
-	W_STATIC_vars.jGvar[21] = 5 ;
-
-	W_STATIC_vars.iGfun[22] = 7 ;
-	W_STATIC_vars.jGvar[22] = 6 ;
-
-	W_STATIC_vars.iGfun[23] = 8 ;
-	W_STATIC_vars.jGvar[23] = 7 ;
-
-	W_STATIC_vars.iGfun[24] = 9 ;
-	W_STATIC_vars.jGvar[24] = 8 ;
-
-	W_STATIC_vars.iGfun[25] = 10 ;
-	W_STATIC_vars.jGvar[25] = 9 ;
-
-	W_STATIC_vars.iGfun[26] = 11 ;
-	W_STATIC_vars.jGvar[26] = 10 ;
-
-	W_STATIC_vars.iGfun[27] = 12 ;
-	W_STATIC_vars.jGvar[27] = 11 ;
-
-	W_STATIC_vars.iGfun[28] = 13 ;
-	W_STATIC_vars.jGvar[28] = 12 ;
-
-	W_STATIC_vars.iGfun[29] = 14 ;
-	W_STATIC_vars.jGvar[29] = 13 ;
-
-	W_STATIC_vars.iGfun[30] = 15 ;
-	W_STATIC_vars.jGvar[30] = 14 ;
-
-	W_STATIC_vars.iGfun[31] = 16 ;
-	W_STATIC_vars.jGvar[31] = 15 ;
-
-	W_STATIC_vars.iGfun[32] = 17 ;
-	W_STATIC_vars.jGvar[32] = 16 ;
-
-	W_STATIC_vars.iGfun[33] = 18 ;
-	W_STATIC_vars.jGvar[33] = 17 ;
-
-	W_STATIC_vars.iGfun[34] = 19 ;
-	W_STATIC_vars.jGvar[34] = 18 ;
-
-	W_STATIC_vars.iGfun[35] = 20 ;
-	W_STATIC_vars.jGvar[35] = 19 ;
-
-	W_STATIC_vars.iGfun[36] = 21 ;
-	W_STATIC_vars.jGvar[36] = 20 ;
-
-	W_STATIC_vars.iGfun[37] = 22 ;
-	W_STATIC_vars.jGvar[37] = 21 ;
-
-	W_STATIC_vars.iGfun[38] = 23 ;
-	W_STATIC_vars.jGvar[38] = 22 ;
-
-	W_STATIC_vars.iGfun[39] = 24 ;
-	W_STATIC_vars.jGvar[39] = 23 ;
-
-	W_STATIC_vars.iGfun[40] = 25 ;
-	W_STATIC_vars.jGvar[40] = 24 ;
-
-	W_STATIC_vars.iGfun[41] = 26 ;
-	W_STATIC_vars.jGvar[41] = 25 ;
-
-	W_STATIC_vars.iGfun[42] = 27 ;
-	W_STATIC_vars.jGvar[42] = 26 ;
-
-	W_STATIC_vars.iGfun[43] = 28 ;
-	W_STATIC_vars.jGvar[43] = 27 ;
-
-	W_STATIC_vars.iGfun[44] = 29 ;
-	W_STATIC_vars.jGvar[44] = 28 ;
-
-	W_STATIC_vars.iGfun[45] = 30 ;
-	W_STATIC_vars.jGvar[45] = 29 ;
-
-	W_STATIC_vars.iGfun[46] = 31 ;
-	W_STATIC_vars.jGvar[46] = 30 ;
-
-	W_STATIC_vars.iGfun[47] = 32 ;
-	W_STATIC_vars.jGvar[47] = 31 ;
-
-	W_STATIC_vars.iGfun[48] = 33 ;
-	W_STATIC_vars.jGvar[48] = 32 ;
-
-	W_STATIC_vars.iGfun[49] = 34 ;
-	W_STATIC_vars.jGvar[49] = 33 ;
-
-	W_STATIC_vars.iGfun[50] = 35 ;
-	W_STATIC_vars.jGvar[50] = 34 ;
-
-	W_STATIC_vars.iGfun[51] = 36 ;
-	W_STATIC_vars.jGvar[51] = 35 ;
-
-	W_STATIC_vars.iGfun[52] = 37 ;
-	W_STATIC_vars.jGvar[52] = 36 ;
-
-	W_STATIC_vars.iGfun[53] = 38 ;
-	W_STATIC_vars.jGvar[53] = 37 ;
-	/////
-	W_STATIC_vars.iGfun[54] = 39 ;
-	W_STATIC_vars.jGvar[54] = 0 ;
-
-	W_STATIC_vars.iGfun[55] = 40 ;
-	W_STATIC_vars.jGvar[55] = 1 ;
-
-	W_STATIC_vars.iGfun[56] = 41 ;
-	W_STATIC_vars.jGvar[56] = 2 ;
-
-	W_STATIC_vars.iGfun[57] = 42 ;
-	W_STATIC_vars.jGvar[57] = 3 ;
-
-	W_STATIC_vars.iGfun[58] = 43 ;
-	W_STATIC_vars.jGvar[58] = 4 ;
-
-	W_STATIC_vars.iGfun[59] = 44 ;
-	W_STATIC_vars.jGvar[59] = 5 ;
-
-	W_STATIC_vars.iGfun[60] = 45 ;
-	W_STATIC_vars.jGvar[60] = 6 ;
-
-	W_STATIC_vars.iGfun[61] = 46 ;
-	W_STATIC_vars.jGvar[61] = 7 ;
-
-	W_STATIC_vars.iGfun[62] = 47 ;
-	W_STATIC_vars.jGvar[62] = 8 ;
-
-	W_STATIC_vars.iGfun[63] = 48 ;
-	W_STATIC_vars.jGvar[63] = 9 ;
-
-	W_STATIC_vars.iGfun[64] = 49 ;
-	W_STATIC_vars.jGvar[64] = 10 ;
-
-	W_STATIC_vars.iGfun[65] = 50 ;
-	W_STATIC_vars.jGvar[65] = 11 ;
-
-	W_STATIC_vars.iGfun[66] = 51 ;
-	W_STATIC_vars.jGvar[66] = 12 ;
-
-	W_STATIC_vars.iGfun[67] = 52 ;
-	W_STATIC_vars.jGvar[67] = 13 ;
-
-	W_STATIC_vars.iGfun[68] = 53 ;
-	W_STATIC_vars.jGvar[68] = 14 ;
-
-	W_STATIC_vars.iGfun[69] = 54 ;
-	W_STATIC_vars.jGvar[69] = 15 ;
-
-	W_STATIC_vars.iGfun[70] = 55 ;
-	W_STATIC_vars.jGvar[70] = 16 ;
-
-	W_STATIC_vars.iGfun[71] = 56 ;
-	W_STATIC_vars.jGvar[71] = 17 ;
-
-	W_STATIC_vars.iGfun[72] = 57 ;
-	W_STATIC_vars.jGvar[72] = 18 ;
-
-	W_STATIC_vars.iGfun[73] = 58 ;
-	W_STATIC_vars.jGvar[73] = 19 ;
-
-	W_STATIC_vars.iGfun[74] = 59 ;
-	W_STATIC_vars.jGvar[74] = 20 ;
-
-	W_STATIC_vars.iGfun[75] = 60 ;
-	W_STATIC_vars.jGvar[75] = 21 ;
-
-	W_STATIC_vars.iGfun[76] = 61 ;
-	W_STATIC_vars.jGvar[76] = 22 ;
-
-	W_STATIC_vars.iGfun[77] = 62 ;
-	W_STATIC_vars.jGvar[77] = 23 ;
-
-	W_STATIC_vars.iGfun[78] = 63 ;
-	W_STATIC_vars.jGvar[78] = 24 ;
-
-	W_STATIC_vars.iGfun[79] = 64 ;
-	W_STATIC_vars.jGvar[79] = 25 ;
-
-	W_STATIC_vars.iGfun[80] = 65 ;
-	W_STATIC_vars.jGvar[80] = 26 ;
-
-	W_STATIC_vars.iGfun[81] = 66 ;
-	W_STATIC_vars.jGvar[81] = 27 ;
-
-	W_STATIC_vars.iGfun[82] = 67 ;
-	W_STATIC_vars.jGvar[82] = 28 ;
-
-	W_STATIC_vars.iGfun[83] = 68 ;
-	W_STATIC_vars.jGvar[83] = 29 ;
-
-	W_STATIC_vars.iGfun[84] = 69 ;
-	W_STATIC_vars.jGvar[84] = 30 ;
-
-	W_STATIC_vars.iGfun[85] = 70 ;
-	W_STATIC_vars.jGvar[85] = 31 ;
-
-	W_STATIC_vars.iGfun[86] = 71 ;
-	W_STATIC_vars.jGvar[86] = 32 ;
-
-	W_STATIC_vars.iGfun[87] = 72 ;
-	W_STATIC_vars.jGvar[87] = 33 ;
-
-	W_STATIC_vars.iGfun[88] = 73 ;
-	W_STATIC_vars.jGvar[88] = 34 ;
-
-	W_STATIC_vars.iGfun[89] = 74 ;
-	W_STATIC_vars.jGvar[89] = 35 ;
-
-	W_STATIC_vars.iGfun[90] = 75 ;
-	W_STATIC_vars.jGvar[90] = 36 ;
-
-	W_STATIC_vars.iGfun[91] = 76 ;
-	W_STATIC_vars.jGvar[91] = 37 ;
-
+	// This loop defines the patern of elements from i=16 to i=53 which are related to the equation of constraints on joint angles.
+	// For joint angle constraints: iGfun=1 to 38 
+	// Each row has one non-zero element
+	
+	int k = 1 ;
+	for (unsigned int i = 16 ; i < 54 ; ++i)
+	{
+		W_STATIC_vars.iGfun[i] = k ;    // row index
+		W_STATIC_vars.jGvar[i] = k - 1 ;   // column index
+		k = k + 1 ;
+	}
+	
+	// This loop defines the patern of elements from i=54 to i=91 which are related to the equation of constraints on joint velocity.
+	// For velocity constraints: iGfun=39 to 76 
+	// Each row has one non-zero element
+	
+	int kk = 39 ;
+	for (unsigned int i = 54 ; i < 92 ; ++i)
+	{
+		W_STATIC_vars.iGfun[i] = kk ;    // row index
+		W_STATIC_vars.jGvar[i] = kk - 39 ;   // column index
+		kk = kk + 1 ;
+	}
+	
+	
+	// This loop defines the patern of elements from i=92 to i=107 which are related to the equation of constraint on center of mass. 
+	// For center of mass constraint: iGfun=77 
+	
 	int kk = 0 ;
 	for (unsigned int k = 92; k<108 ; ++k )
 	{
 		W_STATIC_vars.iGfun[k] = 77 ;
 		W_STATIC_vars.jGvar[k] = kk ;
 		kk = kk + 1 ;
-	}
-	 */
+	}*/
 
-
+	//This loop defines the patern of elements related to the equation of constraint on velocity direction.
+	// In order to see the effect of this constraint, we removed all other constraint.
+	// To solve the general problem, uncomment all above loops and modify the indices of the following loop
 	int kk = 0 ;
 	for (unsigned int i = 16 ; i<54 ; ++i)
 	{
@@ -915,9 +462,8 @@ void iCubOpt::W_STATIC_update(double x[])
 		W_STATIC_vars.jGvar[i] = kk ;
 		kk=kk+1 ;
 	}
+
 	snopt_load_vars_full(W_STATIC_vars);
-
-
 }
 
 
