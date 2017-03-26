@@ -18,3 +18,5 @@ The main loop which includes stopping criteria of the optimization has been defi
 
 Also, there is another function (W_STATIC_shot) which defines the equation of cost function and constrints. Also, known elements of gradient matrix should be defined here. 
 
+[iCubOpt.cpp](https://github.com/epfl-lasa/ICub_Optimization/blob/master/icub-opt/src/iCubOpt.cpp) includes two different functions in order to initialize and update all states of the system (joint angles and velocity). In the first step of optimization, iCubOpt::init initializes iCub model from SDFAST library and sets the initial angle and velocity of all robot joints. In the next steps, iCubOpt::update will update the system states. 
+
